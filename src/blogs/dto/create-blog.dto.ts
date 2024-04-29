@@ -8,4 +8,8 @@ export class CreateBlogDto {
     @IsString()
     @IsNotEmpty()
     content: string;
+
+    @IsString()
+    @IsNotEmpty()
+    category: string;
 }

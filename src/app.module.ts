@@ -4,16 +4,17 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { BlogsModule } from './blogs/blogs.module';
-import { JwtAuthMiddleware } from './auth.middleware'; 
+import { JwtAuthMiddleware } from './auth.middleware';
+import config from './config';
 
 @Module({
   imports: [SequelizeModule.forRoot({
     dialect: 'postgres',
-    host: 'localhost',
+    host: config.host|| 'localhost',
     port: 5432,
-    username: 'dev',
-    password: 'password',
-    database: 'basic-blog',
+    username: config.username,
+    password: config.password,
+    database: config.database,
     autoLoadModels: true,
     synchronize: true,
     logging: false

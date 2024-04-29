@@ -1,16 +1,19 @@
 import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthDto } from './dto/auth.dto';
 import { User } from '../models/user.model';
 import { UniqueConstraintError } from 'sequelize';
 import * as jwt from 'jsonwebtoken'
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Injectable()
 export class UsersService {
 
     async getUsers() {
-        return await User.findAll();
+        const users = await User.findAll();
+        return users.map(user => user.toJSON());
     }
 
     async getUser(id: number) {
@@ -18,14 +21,14 @@ export class UsersService {
         if (!user) {
             throw new NotFoundException(`User with id ${id} not found`);
         }
-        return user;
+        return user.toJSON();
     }
 
     async createUser(createUserDto: CreateUserDto) {
         try{
             const user = new User({ ...createUserDto });
             await user.save();
-            return user;
+            return user.toJSON();
         } catch (error) {
             if (error instanceof UniqueConstraintError) {
                 if (error.errors.some(e => e.path === 'email')) {
@@ -45,7 +48,7 @@ export class UsersService {
             return new BadRequestException('Invalid username or password');
         }
 
-        const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, 'simplesecret', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         return { token };
 

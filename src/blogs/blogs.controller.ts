@@ -10,13 +10,12 @@ export class BlogsController {
         constructor(private readonly blogsService: BlogsService) { }
     
         @Get() // GET /blogs
-
-        findAll() {
-            return this.blogsService.getBlogs()
+        getBlogs(@Query('page') page: number = 1, @Query('pageSize') pageSize: number = 10) {
+            return this.blogsService.getBlogs(page, pageSize);
         }
     
         @Get(':id') // GET /blogs/:id
-        findOne(@Param('id', ParseIntPipe) id: number) {
+        getBlog(@Param('id', ParseIntPipe) id: number) {
             return this.blogsService.getBlog(id)
         }
     
@@ -35,8 +34,8 @@ export class BlogsController {
             return this.blogsService.deleteBlog(id, req)
         }
 
-        @Patch(':id/verify') // PATCH /blogs/:id/verify
+        @Patch(':id/approve') // PATCH /blogs/:id/verify
         verifyBlog(@Param('id', ParseIntPipe) id: number, @Req() req: Request){
-            return this.blogsService.verifyBlog(id, req)
+            return this.blogsService.approveBlog(id, req)
         }
 }

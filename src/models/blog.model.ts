@@ -14,11 +14,20 @@ export class Blog extends Model {
 
     @ForeignKey(() => User)
     @Column
-    userId: number;
+    authorId: number;
 
     @BelongsTo(() => User)
-    user: User;
+    author: User;
 
     @Column({ defaultValue: false })
-    isVerified: boolean;
+    isApproved: boolean;
+
+    @Column
+    category: string;
+
+    toJSON() {
+        const values = Object.assign({}, this.get());
+        delete values.authorId;
+        return values;
+    }
 }

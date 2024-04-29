@@ -6,10 +6,10 @@ export class User extends Model {
     @Column({ primaryKey: true, autoIncrement: true })
     id: number;
 
-    @Column({ allowNull: false })
+    @Column({ allowNull: false, unique: true })
     username: string;
 
-    @Column({ allowNull: false })
+    @Column({ allowNull: false, unique: true })
     email: string;
 
     @Column({ allowNull: false })
@@ -20,6 +20,12 @@ export class User extends Model {
 
     async validatePassword(password: string): Promise<boolean> {
         return await bcrypt.compare(password, this.password);
+    }
+
+    toJSON() {
+        const values = Object.assign({}, this.get());
+        delete values.password;
+        return values;
     }
 
     // Hash the password before saving it to the database

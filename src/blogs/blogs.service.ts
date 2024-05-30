@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException, Injectable, Req } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, Request } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { Blog } from '../models/blog.model';
@@ -37,9 +37,9 @@ export class BlogsService {
         return blog;
     }
 
-    async createBlog(createBlogDto: CreateBlogDto, @Req() req: Request){
+    async createBlog(createBlogDto: CreateBlogDto, @Request() req){
         try{
-            const loggedInUser = JSON.parse(req.headers['user']);
+            const loggedInUser = req.user;
             createBlogDto['userId'] = loggedInUser.id;
             var blog = new Blog({ ...createBlogDto });
             await blog.save();
@@ -51,14 +51,15 @@ export class BlogsService {
         }
     }
 
-    async updateBlog(id: number, updateBlogDto: UpdateBlogDto, @Req() req: Request) {
+    async updateBlog(id: number, updateBlogDto: UpdateBlogDto, @Request() req) {
         try {
+            const loggedInUser = req.user;
             delete updateBlogDto['userId'];
             const blog = await Blog.findByPk(id);
             if (!blog) {
                 throw new NotFoundException(`Blog with id ${id} not found`);
             }
-            if (blog.authorId !== JSON.parse(req.headers['user']).id) {
+            if (blog.authorId !== loggedInUser.id) {
                 return new BadRequestException('You cannot update this blog');
             }
             await blog.update({ ...updateBlogDto });
@@ -70,9 +71,9 @@ export class BlogsService {
         }
     }
 
-    async deleteBlog(id: number, @Req() req: Request) {
+    async deleteBlog(id: number, @Request() req) {
 
-        const loggedInUser = JSON.parse(req.headers['user']);
+        const loggedInUser = req.user;
         
         const blog = await Blog.findByPk(id);
         if (!blog) {
@@ -86,9 +87,9 @@ export class BlogsService {
         return blog;
     }
 
-    async approveBlog(id: number, @Req() req: Request) {
+    async approveBlog(id: number, @Request() req) {
 
-        let loggedInUser = JSON.parse(req.headers['user']);
+        let loggedInUser = req.user;
         if (loggedInUser.role !== 'admin') {
             throw new BadRequestException('You are not authorized to verify a blog');
         }

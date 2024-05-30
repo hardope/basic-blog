@@ -1,17 +1,14 @@
-import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, Request } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthDto } from './dto/auth.dto';
 import { User } from '../models/user.model';
 import { UniqueConstraintError } from 'sequelize';
 import * as jwt from 'jsonwebtoken'
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 @Injectable()
 export class UsersService {
 
-    async getUsers() {
+    async getUsers(){
         const users = await User.findAll();
         return users.map(user => user.toJSON());
     }
@@ -52,5 +49,9 @@ export class UsersService {
 
         return { token };
 
+    }
+
+    async getUserByUsername(username: string) {
+        return await User.findOne({ where: { username } });
     }
 }

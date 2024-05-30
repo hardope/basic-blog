@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { BlogsModule } from './blogs/blogs.module';
-import { JwtAuthMiddleware } from './auth.middleware';
+import { AuthModule } from './auth/auth.module';
 import config from './config';
 
 @Module({
@@ -18,8 +18,8 @@ import config from './config';
     autoLoadModels: true,
     synchronize: true,
     logging: false
-  }),UsersModule, BlogsModule],
+  }),UsersModule, BlogsModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService, JwtAuthMiddleware],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ValidationPipe, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ValidationPipe, Request, UseGuards } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 
 @Controller('blogs')
@@ -20,22 +21,26 @@ export class BlogsController {
         }
     
         @Post() // POST /blogs
-        createBlog(@Body(ValidationPipe) createBlogDto: CreateBlogDto, @Req() req: Request) {
+        @UseGuards(JwtGuard)
+        createBlog(@Body(ValidationPipe) createBlogDto: CreateBlogDto, @Request() req) {
             return this.blogsService.createBlog(createBlogDto, req)
         }
     
         @Patch(':id') // PATCH /blogs/:id
-        updateBlog(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateBlogDto: UpdateBlogDto, @Req() req: Request){
+        @UseGuards(JwtGuard)
+        updateBlog(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateBlogDto: UpdateBlogDto, @Request() req){
             return this.blogsService.updateBlog(id, updateBlogDto, req)
         }
     
         @Delete(':id') // DELETE /blogs/:id
-        deleteBlog(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+        @UseGuards(JwtGuard)
+        deleteBlog(@Param('id', ParseIntPipe) id: number, @Request() req) {
             return this.blogsService.deleteBlog(id, req)
         }
 
         @Patch(':id/approve') // PATCH /blogs/:id/verify
-        verifyBlog(@Param('id', ParseIntPipe) id: number, @Req() req: Request){
+        @UseGuards(JwtGuard)
+        verifyBlog(@Param('id', ParseIntPipe) id: number, @Request() req){
             return this.blogsService.approveBlog(id, req)
         }
 }

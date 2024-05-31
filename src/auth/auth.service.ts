@@ -27,7 +27,17 @@ export class AuthService {
         return {
             user: userobj.toJSON(),
             access_token: this.jwtService.sign(payload),
+            refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
         };
+    }
+
+    async refresh(user: any) {
+        let userobj = await User.findByPk(user.user.id);
+        const payload = { user: userobj.toJSON() };
+
+        return {
+            "access_token": this.jwtService.sign(payload),
+        }
     }
 
 }
